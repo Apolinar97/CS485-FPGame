@@ -1,6 +1,10 @@
-﻿using System.Collections;
+﻿//Name: Apolinar Camacho
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -8,10 +12,19 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float jumpForce;
     [SerializeField] private float raycastDistance;
     private Rigidbody rb;
+    public AudioSource coinSound;
+    public Text WinMessage;
+    public Text countText;
+    private int count;
+
 
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
+        coinSound = GetComponent<AudioSource>();
+        WinMessage.text = "";
+        count = 0;
+        setCount();
     }
 
     private void Update()
@@ -51,5 +64,34 @@ public class PlayerController : MonoBehaviour
     {
 
         return Physics.Raycast(transform.position, Vector3.down, raycastDistance); 
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.gameObject.CompareTag("CoinObj"))
+        {
+            other.gameObject.SetActive(false);
+            coinSound.Play();
+            count++;
+            setCount();
+        }
+
+        if (other.gameObject.CompareTag("GroundHit"))
+        {
+            Debug.Log("Ground Hit!");
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
+
+        }
+
+        if(other.gameObject.CompareTag("EndBase"))
+        {
+            WinMessage.text = "You Win!";
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
+        }
+    }
+
+    public void setCount()
+    {
+        countText.text = "Count: " + count.ToString();
     }
 }
